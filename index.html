@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>API homework</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>Game Search</h1>
+
+    <div id="buttons-view"></div>
+
+    <form id="game-form">
+      <label for="game-input">Add a game</label>
+      <input type="text" id="game-input"><br>
+
+      <input class="add-game" type="submit" value="Add a game">
+    </form>
+
+    <div id="gifs-appear-here">
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+     $(document).ready(function() {
+      var gameArray = ["The Legend of Zelda", "Super Mario Bros", "Pokemon Platinum", "Super Smash Bros Ultimate", "Overwatch", "Final Fantasy", "Mario Kart"];
+      function renderButtons() {
+        $("#buttons-view").empty();
+        for (var i = 0; i < gameArray.length; i++) {
+          var a = $("<button>");
+          a.addClass("game");
+          a.attr("data-name", gameArray[i]);
+          a.attr("class", "gameButton")
+          a.text(gameArray[i]);
+          $("#buttons-view").append(a);
+        }
+      }
+
+
+      $(".add-game").on("click", function(event) {
+        event.preventDefault();
+        var gameInput = $("#game-input").val().trim();
+        gameArray.push(gameInput);
+        renderButtons();
+      });
+
+      //For some reason, everytime i hit the add game button, all my buttons stop working and I cant seem to figure out what is causing the bug. Everything else is working before I hit the add button.
+      
+      renderButtons();
+
+    $(".gameButton").on("click", function() {
+     var game = $(this).attr("data-name");
+     var queryURL = "https://api.giphy.com/v1/gifs/search?api_key=Bg9PJjxPTHC7h2gQ6515aGhxJuOSJaeD&q=" + game + "&limit=10&offset=0&rating=G&lang=en";
+     $.ajax({
+       url: queryURL,
+       method: "GET"
+     }).then(function(response) {
+         console.log(queryURL);
+         console.log(response);
+         var results = response.data;
+         for (var i = 0; i < results.length; i++) {
+           var gameDiv = $("<div>");
+           var p = $("<p>").text("Rating: " + results[i].rating);
+           var gameImage = $("<img>");
+           gameImage.attr("src", results[i].images.fixed_height.url);
+           gameDiv.append(p);
+           gameDiv.append(gameImage);
+           $("#gifs-appear-here").prepend(gameDiv);
+         }
+       });
+   });
+     });
+    </script>
+  </div>
+</body>
+
+</html>
